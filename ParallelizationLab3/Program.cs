@@ -17,12 +17,27 @@ namespace ParallelizationLab3
 
         private static void StartE()
         {
-            int fluxes = 12;
             int n = 22;
 
-            //DataForFormulas dataForFormulas = new DataForFormulas(n); //разобраться в теории наследования конструкторов
-            //ParallelizationCode parallelization = new ParallelizationCode(fluxes);
+            //TestForAllFluxes(n); //для замера времени
 
+            Experiment(n);
+            DataForFormulas.CollectionAllE(); // Е из потоков в один общий список ----- ALERT!!!
+            var E = DataForFormulas.valuesE;
+            Console.WriteLine($"E.Max() = {E.Max()}");
+
+            CalculationsAverAmax.TableRo(); //таблица ро с тильдой
+
+            CalculationsAverAmax.AverageAmax();
+            WritingFile.FileForGraphAverAmax(DataForFormulas.avAmax, DataForFormulas.valuesT, "Amax"); //значения <Amax> записываем в файл
+
+            E.Sort(); //16 млн за ~2 сек // ---------- сортировку не проводить до того, как все рассчитается!!!
+            WritingFile.FileForGraphEndBeg(E, "GraphE"); //значения E записываем в файл
+        }
+
+        private static void Experiment(int n)
+        {
+            int fluxes = 12;
             DataForFormulas.InitialConditionsData(n, fluxes); //инициализация и объявление исходных данных
 
             Stopwatch time = new Stopwatch(); //время
@@ -32,33 +47,42 @@ namespace ParallelizationLab3
 
             time.Stop(); //время
 
-            DataForFormulas.CollectionAllE(); // Е из потоков в один общий список ----- ALERT!!!
+            double myTime = time.ElapsedMilliseconds / 1000.0;
+            Console.WriteLine($"потоков = {fluxes}\tвремя = {myTime} сек"); //время
+        }
 
-            double timeRes = time.ElapsedMilliseconds / 1000.0; //время
-            Console.WriteLine($"время = {timeRes}"); //время
+        private static void TestForAllFluxes(int n)
+        {
+            double[,] timeTable = new double[11, 12];
+            Console.WriteLine(n);
+            for (int i = 0; i < 12; i++)
+            {
+                int fluxes = i + 1;
+                timeTable[0, i] = fluxes;
+                for (int j = 0; j < 10; j++)
+                {
+                    DataForFormulas.InitialConditionsData(n, fluxes); //инициализация и объявление исходных данных
 
-            var E = DataForFormulas.valuesE;
-            //e.Sort(); //16 млн за ~2 сек // ---------- сортировку не проводить до того, как все рассчитается!!!
+                    Stopwatch time = new Stopwatch(); //время
+                    time.Start(); //время
 
-            Console.WriteLine($"e.Max() = {E.Max()}");
-            Console.WriteLine(Math.Pow(2, n) == E.Count);
-            Console.WriteLine(Math.Pow(2, n) - E.Count);
+                    ParallelizationCode.StartParalCalc(); // --- запуск ||
 
-            WritingFile.FileForGraphEndBeg(E, "GraphE"); //значения E записываем в файл
+                    time.Stop(); //время
 
-            Stopwatch time1 = new Stopwatch(); //время
-            time1.Start(); //время
+                    double myTime = time.ElapsedMilliseconds / 1000.0;
+                    Console.WriteLine($"потоков = {fluxes}\tвремя = {myTime} сек"); //время
 
-            CalculationsAverAmax.TableRo(); //таблица ро с тильдой ------- ТРЕБУЕТ ||
-            //Calculations.VectorRo();
+                    DataForFormulas.CollectionAllE(); // Е из потоков в один общий список ----- ALERT!!!
+                    var E = DataForFormulas.valuesE;
+                    Console.WriteLine($"E.Max() = {E.Max()}");
 
-            time1.Stop(); //время
+                    timeTable[j + 1, i] = myTime;
+                }
+                Console.WriteLine();
 
-            Console.WriteLine($"время на таблицу = {time1.ElapsedMilliseconds / 1000.0}"); //время
-
-            //Calculations.AverageAmax();
-            CalculationsAverAmax.AverageAmax();
-            WritingFile.FileForGraphBegEnd(DataForFormulas.avAmax, "Amax"); //значения <Amax> записываем в файл
+            }
+            WritingFile.FileForGraphAverAmax(timeTable, "Time");
         }
     }
 }

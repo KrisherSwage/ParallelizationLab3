@@ -68,22 +68,33 @@ namespace ParallelizationLab3
 
         public static void InitialConditionsData(int n, int fl)
         {
+            listForDataTask.Clear();
+            valuesRoTilda.Clear();
+            сoefA.Clear();
+            coefB.Clear();
+            valuesE.Clear();
+
             N = n;
             fluxes = fl;
 
             ValuesCoefA();
             ValuesCoefB();
 
+            // выглючу на время замера времени
+            /**/
             FindIndexMaxA();
             SequenceAmax();
+            /**/
 
             for (int i = 0; i < fluxes; i++)
             {
                 listForDataTask.Add(new List<double>());
             }
 
+            /**/
             ValuesT();
             numberRo();
+            /**/
         }
 
         /// <summary>
@@ -181,7 +192,5 @@ namespace ParallelizationLab3
                 }
             }
         }
-
-
     }
 }

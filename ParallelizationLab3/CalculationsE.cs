@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ParallelizationLab3
 {
     internal class CalculationsE : DataForFormulas
     {
-        public static void CalcManyE(int leftBor, int rightBor) // Пока ХЗ, но МБ проблема с беспорядком записи E в общий список сама собой решена тут или тут решаема (через ID)
+        public static void CalcManyE(int leftBor, int rightBor)
         {
-            int taskNumber = Convert.ToInt32(Task.CurrentId) % fluxes;
+            int taskNumber = Convert.ToInt32(Convert.ToInt32(Task.CurrentId) - 1) % fluxes; //-1 решает проблему с неправильным порядком
             for (int i = leftBor; i < rightBor; i++) //цикл для всех E (при N = 24 ~ 16 млн)
             {
                 listForDataTask[taskNumber].Add(CalculateE(leftBor, rightBor, i));

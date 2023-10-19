@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ParallelizationLab3
 {
     internal class ParallelizationCode : DataForFormulas
     {
-
         /// <summary>
         /// Общее количество E
         /// </summary>
@@ -19,9 +14,8 @@ namespace ParallelizationLab3
 
         private static void InitialConditionsParall()
         {
-            //Console.WriteLine($"fl = {fl}");
             amountOfE = Convert.ToInt32(Math.Pow(2, N));
-            amntEInFlux = amountOfE / fluxes; //важно сделать так, чтобы не было потерь /////////////////////////////////////////////
+            amntEInFlux = amountOfE / fluxes; //потерь не будет - исправил
         }
 
         public static void StartParalCalc()
@@ -34,7 +28,7 @@ namespace ParallelizationLab3
                 var leftBor = amntEInFlux * i;
                 var rightBor = amntEInFlux * (i + 1);
 
-                if (i == fluxes - 1)
+                if (i == fluxes - 1) //нет потерь
                 {
                     rightBor = amountOfE;
                 }
@@ -44,7 +38,6 @@ namespace ParallelizationLab3
             }
 
             Task.WaitAll(tasks);
-
         }
     }
 }
